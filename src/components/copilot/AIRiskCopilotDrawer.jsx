@@ -115,29 +115,29 @@ I synthesize natural language insights directly from our **active FAIR quantific
   };
 
   return (
-    <div className="fixed inset-y-0 right-0 z-50 w-full sm:w-[480px] bg-slate-900 border-l border-slate-800 shadow-2xl flex flex-col">
+    <div className="fixed inset-y-0 right-0 z-50 w-full sm:w-[500px] bg-[#12131b] border-l border-white/[0.08] shadow-2xl shadow-black/80 flex flex-col animate-slide-in-right">
       {/* Drawer Header */}
-      <div className="p-4 bg-slate-950 border-b border-slate-800 flex items-center justify-between">
-        <div className="flex items-center space-x-2.5">
-          <div className="w-8 h-8 rounded-lg bg-sky-500/10 border border-sky-500/30 flex items-center justify-center text-sky-400">
+      <div className="p-4 bg-[#161720] border-b border-white/[0.07] flex items-center justify-between">
+        <div className="flex items-center space-x-3">
+          <div className="w-8 h-8 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
             <Bot className="w-4 h-4" />
           </div>
           <div>
             <div className="flex items-center space-x-2">
               <h3 className="text-xs font-bold text-white uppercase tracking-wider">AI Risk Copilot</h3>
-              <span className="text-[10px] font-mono bg-slate-900 text-sky-400 px-1.5 py-0.5 rounded border border-slate-800">
+              <span className="text-[10px] font-mono bg-amber-500/15 text-amber-300 px-2 py-0.5 rounded-full border border-amber-500/30">
                 Grounded
               </span>
             </div>
-            <p className="text-[11px] text-slate-400">
-              Role context: <span className="text-slate-200 font-semibold">{activeRole}</span>
+            <p className="text-[11px] text-zinc-400 mt-0.5">
+              Role context: <span className="text-zinc-200 font-semibold">{activeRole}</span>
             </p>
           </div>
         </div>
 
         <button
           onClick={() => setIsCopilotDrawerOpen(false)}
-          className="text-slate-400 hover:text-white p-1 rounded hover:bg-slate-800 transition-colors"
+          className="text-zinc-400 hover:text-white p-1.5 rounded-lg hover:bg-white/[0.05] transition-colors"
         >
           <X className="w-4 h-4" />
         </button>
@@ -151,20 +151,20 @@ I synthesize natural language insights directly from our **active FAIR quantific
             className={`flex flex-col ${msg.sender === 'user' ? 'items-end' : 'items-start'}`}
           >
             <div
-              className={`max-w-[92%] rounded-lg p-3 text-xs leading-relaxed ${
+              className={`max-w-[92%] text-xs leading-relaxed ${
                 msg.sender === 'user'
-                  ? 'bg-sky-600 text-white rounded-br-none'
-                  : 'bg-slate-950 border border-slate-800 text-slate-200 rounded-bl-none space-y-2'
+                  ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-zinc-950 font-medium rounded-2xl rounded-tr-sm p-4 shadow-md shadow-orange-500/15'
+                  : 'bg-[#161720] border border-white/[0.07] text-zinc-200 rounded-2xl rounded-tl-sm p-4 space-y-3 shadow-md'
               }`}
             >
               {/* Message Body with simple markdown line rendering */}
               <div className="whitespace-pre-wrap">
                 {msg.text.split('\n').map((line, lidx) => {
                   if (line.startsWith('### ')) {
-                    return <h4 key={lidx} className="font-bold text-white text-xs mt-1 mb-1">{line.replace('### ', '')}</h4>;
+                    return <h4 key={lidx} className="font-bold text-white text-xs mt-2 mb-1">{line.replace('### ', '')}</h4>;
                   }
                   if (line.startsWith('**') && line.endsWith('**')) {
-                    return <div key={lidx} className="font-semibold text-sky-300 my-0.5">{line.replace(/\*\*/g, '')}</div>;
+                    return <div key={lidx} className="font-semibold text-amber-300 my-1">{line.replace(/\*\*/g, '')}</div>;
                   }
                   return <div key={lidx}>{line}</div>;
                 })}
@@ -172,15 +172,15 @@ I synthesize natural language insights directly from our **active FAIR quantific
 
               {/* Source Attribution Metadata Badges */}
               {msg.sources && msg.sources.length > 0 && (
-                <div className="pt-2 border-t border-slate-800/80 mt-2">
-                  <div className="text-[10px] text-slate-400 uppercase tracking-wider font-mono mb-1">
+                <div className="pt-3 border-t border-white/[0.06] mt-2">
+                  <div className="text-[10px] text-zinc-400 uppercase tracking-wider font-mono mb-1.5">
                     Grounded State Citations:
                   </div>
-                  <div className="flex flex-wrap gap-1">
+                  <div className="flex flex-wrap gap-1.5">
                     {msg.sources.map((src, sidx) => (
                       <span
                         key={sidx}
-                        className="bg-slate-900 text-slate-300 text-[10px] font-mono px-2 py-0.5 rounded border border-slate-800"
+                        className="bg-[#111218] text-zinc-300 text-[10px] font-mono px-2.5 py-1 rounded-md border border-white/[0.06]"
                       >
                         {src.label}
                       </span>
@@ -191,22 +191,22 @@ I synthesize natural language insights directly from our **active FAIR quantific
 
               {/* Interactive Direct Action Buttons */}
               {msg.actions && msg.actions.length > 0 && (
-                <div className="pt-2 flex flex-wrap gap-1.5 mt-1">
+                <div className="pt-2 flex flex-wrap gap-2 mt-1">
                   {msg.actions.map((act, aidx) => (
                     <button
                       key={aidx}
                       onClick={() => handleActionClick(act)}
-                      className="px-2.5 py-1 bg-slate-900 hover:bg-slate-800 text-sky-300 rounded text-[11px] border border-sky-500/30 flex items-center space-x-1 font-medium transition-colors"
+                      className="px-3 py-1.5 bg-[#111218] hover:bg-[#181924] text-amber-300 rounded-xl text-[11px] border border-amber-500/30 flex items-center space-x-1.5 font-semibold transition-all shadow-sm"
                     >
                       <span>{act.label}</span>
-                      <ExternalLink className="w-3 h-3 text-sky-400 ml-0.5" />
+                      <ExternalLink className="w-3 h-3 text-amber-400 ml-0.5" />
                     </button>
                   ))}
                 </div>
               )}
             </div>
 
-            <span className="text-[10px] text-slate-500 font-mono mt-1 px-1">
+            <span className="text-[10px] text-zinc-500 font-mono mt-1 px-1">
               {msg.timestamp}
             </span>
           </div>
@@ -215,9 +215,9 @@ I synthesize natural language insights directly from our **active FAIR quantific
       </div>
 
       {/* Suggested Quick Prompts */}
-      <div className="p-3 bg-slate-950/90 border-t border-slate-800">
-        <div className="text-[10px] text-slate-400 font-mono uppercase tracking-wider mb-2 flex items-center space-x-1">
-          <Sparkles className="w-3 h-3 text-sky-400" />
+      <div className="p-3.5 bg-[#161720] border-t border-white/[0.07]">
+        <div className="text-[10px] text-zinc-400 font-mono uppercase tracking-wider mb-2 flex items-center space-x-1.5">
+          <Sparkles className="w-3 h-3 text-amber-400" />
           <span>Suggested Queries</span>
         </div>
         <div className="flex gap-1.5 overflow-x-auto pb-1 no-scrollbar">
@@ -225,7 +225,7 @@ I synthesize natural language insights directly from our **active FAIR quantific
             <button
               key={pidx}
               onClick={() => handleSend(prompt)}
-              className="text-[11px] bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white px-2.5 py-1 rounded border border-slate-800 whitespace-nowrap transition-colors flex-shrink-0"
+              className="text-[11px] bg-[#111218] hover:bg-[#181924] text-zinc-300 hover:text-white px-3 py-1.5 rounded-full border border-white/[0.08] hover:border-amber-500/30 whitespace-nowrap transition-all flex-shrink-0 shadow-sm"
             >
               {prompt}
             </button>
@@ -234,7 +234,7 @@ I synthesize natural language insights directly from our **active FAIR quantific
       </div>
 
       {/* Input Box */}
-      <div className="p-3 bg-slate-950 border-t border-slate-800">
+      <div className="p-4 bg-[#161720] border-t border-white/[0.07]">
         <form
           onSubmit={e => {
             e.preventDefault();
@@ -247,12 +247,12 @@ I synthesize natural language insights directly from our **active FAIR quantific
             placeholder="Ask anything about risks, budget, attack paths, or compliance..."
             value={inputQuery}
             onChange={e => setInputQuery(e.target.value)}
-            className="flex-1 bg-slate-900 text-xs text-white px-3 py-2 rounded border border-slate-800 focus:outline-none focus:border-sky-500"
+            className="flex-1 bg-[#111218] text-xs text-white px-4 py-2.5 rounded-xl border border-white/[0.08] focus:outline-none focus:border-amber-500/50 transition-colors placeholder-zinc-500"
           />
           <button
             type="submit"
             disabled={!inputQuery.trim()}
-            className="p-2 bg-sky-600 hover:bg-sky-500 disabled:opacity-40 disabled:hover:bg-sky-600 text-white rounded transition-colors"
+            className="p-2.5 bg-gradient-to-r from-amber-500 to-orange-500 hover:opacity-95 disabled:opacity-40 text-zinc-950 font-bold rounded-xl transition-all shadow-md shadow-orange-500/20"
           >
             <Send className="w-4 h-4" />
           </button>

@@ -4,28 +4,82 @@
 
 @layer base {
   body {
-    @apply bg-[#090d14] text-slate-200 font-sans;
+    @apply bg-[#0c0d12] text-zinc-200 font-sans;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    background-image: radial-gradient(ellipse 70% 50% at -5% -5%, rgba(249, 115, 22, 0.1), transparent 70%),
+                      radial-gradient(ellipse 50% 40% at 105% 10%, rgba(168, 85, 247, 0.04), transparent 60%);
+    background-attachment: fixed;
   }
 
   /* Enterprise neutral scrollbar */
   ::-webkit-scrollbar {
-    width: 5px;
-    height: 5px;
+    width: 6px;
+    height: 6px;
   }
   ::-webkit-scrollbar-track {
-    background: #090d14;
+    background: #0e0f14;
   }
   ::-webkit-scrollbar-thumb {
-    background: #1e293b;
-    border-radius: 2px;
+    background: #232530;
+    border-radius: 9999px;
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: #334155;
+    background: #36394a;
   }
 }
 
 .tabular-nums {
   font-variant-numeric: tabular-nums;
+}
+
+/* Custom range slider - consistent cross-browser dark theme */
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  cursor: pointer;
+  height: 6px;
+}
+input[type="range"]::-webkit-slider-runnable-track {
+  background: #1e293b;
+  height: 4px;
+  border-radius: 2px;
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  height: 14px;
+  width: 14px;
+  border-radius: 50%;
+  background: #e2e8f0;
+  border: 2px solid #334155;
+  margin-top: -5px;
+  transition: background 0.15s, transform 0.15s;
+}
+input[type="range"]::-webkit-slider-thumb:hover {
+  background: #f8fafc;
+  transform: scale(1.15);
+}
+input[type="range"]::-moz-range-track {
+  background: #1e293b;
+  height: 4px;
+  border-radius: 2px;
+}
+input[type="range"]::-moz-range-thumb {
+  height: 14px;
+  width: 14px;
+  border-radius: 50%;
+  background: #e2e8f0;
+  border: 2px solid #334155;
+  cursor: pointer;
+}
+
+/* SVG attack path slow-spin selection ring */
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+.animate-spin-slow {
+  animation: spin-slow 8s linear infinite;
+  transform-origin: center;
 }

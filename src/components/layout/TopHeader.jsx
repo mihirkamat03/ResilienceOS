@@ -31,124 +31,122 @@ export const TopHeader = () => {
 
   return (
     <>
-      <header className="h-13 bg-slate-950 border-b border-slate-800 px-5 flex items-center justify-between z-30 sticky top-0">
-        {/* Brand & Organization */}
-        <div className="flex items-center space-x-4">
-          <div className="flex items-center space-x-2.5">
-            <div className="w-7 h-7 rounded bg-slate-900 border border-slate-700 flex items-center justify-center text-sky-400">
-              <Shield className="w-4 h-4" />
-            </div>
-            <div>
-              <div className="flex items-center space-x-2">
-                <span className="text-sm font-bold tracking-tight text-white">ResilienceOS</span>
-                <span className="text-[10px] bg-slate-900 text-slate-400 px-1.5 py-0.2 rounded border border-slate-800 font-mono">
-                  Enterprise
-                </span>
-              </div>
-              <div className="text-[11px] text-slate-400">FintechCore Systems India</div>
-            </div>
+      <header className="h-16 bg-[#0c0e14]/95 backdrop-blur-md border-b border-white/[0.08] px-6 flex items-center justify-between z-30 sticky top-0 select-none">
+        {/* ================================================================= */}
+        {/* ZONE 1: LEFT — IDENTITY                                           */}
+        {/* ================================================================= */}
+        <div className="flex items-center space-x-3.5 min-w-max">
+          <div className="w-8 h-8 rounded-lg bg-[#141722] border border-white/[0.12] flex items-center justify-center shadow-sm">
+            <Shield className="w-4 h-4 text-amber-400" />
           </div>
-
-          <div className="h-4 w-px bg-slate-800" />
-
-          {/* Model Status & Methodology */}
-          <div className="flex items-center space-x-2 text-xs text-slate-400">
-            <span className="w-2 h-2 rounded-full bg-emerald-500" />
-            <span>Risk model: <strong className="text-slate-200 font-normal">FAIR-informed</strong></span>
-            <span className="text-slate-600">·</span>
-            <span>Synced <span className="font-mono text-slate-300">{lastRecalculatedTime}</span></span>
-            <button
-              onClick={simulateTelemetrySync}
-              title="Trigger telemetry rescan"
-              className="p-1 hover:text-sky-400 text-slate-400 hover:bg-slate-900 rounded transition-colors ml-1"
-            >
-              <RefreshCw className="w-3 h-3" />
-            </button>
-
-            <button
-              onClick={() => setIsMethodologyOpen(true)}
-              className="text-[11px] text-sky-400 hover:text-sky-300 underline underline-offset-2 ml-1"
-            >
-              Methodology
-            </button>
+          <div>
+            <div className="flex items-center space-x-2">
+              <span className="text-sm font-bold tracking-tight text-white">ResilienceOS</span>
+            </div>
+            <div className="text-[10px] text-zinc-400 font-normal leading-tight mt-0.5">
+              FintechCore Systems <span className="text-zinc-600">·</span> <span className="text-zinc-500">PS 26105</span>
+            </div>
           </div>
         </div>
 
-        {/* Global Search & Actions */}
-        <div className="flex items-center space-x-3">
-          {/* Global Search Button (Cmd+K) */}
-          <button
-            onClick={() => setIsSearchModalOpen(true)}
-            className="flex items-center space-x-2 bg-slate-900 hover:bg-slate-850 border border-slate-800 text-slate-400 px-3 py-1.5 rounded text-xs transition-colors w-60 justify-between"
-          >
-            <div className="flex items-center space-x-2">
-              <Search className="w-3.5 h-3.5 text-slate-400" />
-              <span>Search risks, assets, controls...</span>
-            </div>
-            <kbd className="text-[10px] bg-slate-950 text-slate-400 px-1.5 py-0.5 rounded border border-slate-800 font-mono">⌘K</kbd>
-          </button>
-
-          {/* Persona Role Switcher */}
-          <div className="flex items-center bg-slate-900 border border-slate-800 rounded p-0.5 text-xs">
-            <div className="text-[11px] text-slate-400 px-2 flex items-center space-x-1">
-              <Layers className="w-3 h-3" />
-              <span>Role:</span>
-            </div>
-            {roles.map(role => (
-              <button
-                key={role}
-                onClick={() => setActiveRole(role)}
-                className={`px-2 py-1 rounded text-xs transition-colors ${
-                  activeRole === role
-                    ? 'bg-slate-800 text-white font-medium'
-                    : 'text-slate-400 hover:text-slate-200'
-                }`}
-              >
-                {role}
-              </button>
-            ))}
+        {/* ================================================================= */}
+        {/* ZONE 2: CENTER — SYSTEM CONTEXT (Subtle, non-competing pill)     */}
+        {/* ================================================================= */}
+        <div className="hidden xl:flex items-center bg-[#12141c] border border-white/[0.06] rounded-full px-4 py-1.5 space-x-3 text-xs shadow-inner">
+          {/* Engine Status */}
+          <div className="flex items-center space-x-2">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-60"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+            </span>
+            <span className="text-[11px] text-zinc-400">
+              Engine: <strong className="text-zinc-200 font-medium ml-0.5">FAIR Quantitative</strong>
+            </span>
           </div>
 
-          {/* Presentation Walkthrough Toggle Button */}
+          <div className="h-3 w-px bg-white/[0.08]" />
+
+          {/* Snapshot Status & Telemetry Rescan */}
+          <div className="flex items-center space-x-1.5 text-[11px] text-zinc-400">
+            <span>Snapshot:</span>
+            <span className="font-mono text-zinc-300 font-medium">{lastRecalculatedTime}</span>
+            <button
+              onClick={simulateTelemetrySync}
+              title="Rescan simulated telemetry"
+              className="p-1 hover:text-white text-zinc-400 hover:bg-white/[0.06] rounded transition-colors ml-0.5"
+            >
+              <RefreshCw className="w-2.5 h-2.5" />
+            </button>
+          </div>
+
+          <div className="h-3 w-px bg-white/[0.08]" />
+
+          {/* Methodology Modal Trigger */}
           <button
-            onClick={() => setIsWalkthroughOpen(!isWalkthroughOpen)}
-            className={`px-2.5 py-1.5 rounded text-xs font-medium border flex items-center space-x-1.5 transition-colors ${
-              isWalkthroughOpen
-                ? 'bg-slate-800 text-sky-300 border-slate-700'
-                : 'bg-slate-900 text-slate-400 border-slate-800 hover:text-slate-200'
-            }`}
-            title="Toggle Demo Presentation Steps"
+            onClick={() => setIsMethodologyOpen(true)}
+            className="text-[11px] text-amber-400 hover:text-amber-300 font-medium transition-colors flex items-center space-x-1 hover:underline underline-offset-2"
           >
-            <Play className="w-3 h-3 text-sky-400" />
-            <span>Walkthrough</span>
+            <HelpCircle className="w-3 h-3 text-amber-400/80" />
+            <span>Methodology</span>
+          </button>
+        </div>
+
+        {/* ================================================================= */}
+        {/* ZONE 3: RIGHT — ACTIONS & CONTROLS                                */}
+        {/* ================================================================= */}
+        <div className="flex items-center space-x-3">
+          {/* Global Search Command Bar */}
+          <button
+            onClick={() => setIsSearchModalOpen(true)}
+            className="hidden lg:flex items-center justify-between w-56 h-9 px-3 rounded-lg bg-[#12141c] hover:bg-[#171924] border border-white/[0.08] hover:border-white/[0.14] text-zinc-400 hover:text-zinc-300 text-xs transition-all shadow-inner group"
+          >
+            <div className="flex items-center space-x-2 truncate">
+              <Search className="w-3.5 h-3.5 text-zinc-500 group-hover:text-zinc-400 shrink-0" />
+              <span className="text-[11px] text-zinc-400 group-hover:text-zinc-300 truncate">Search risks, CVEs, assets...</span>
+            </div>
+            <kbd className="text-[10px] bg-white/[0.06] text-zinc-400 px-1.5 py-0.5 rounded border border-white/[0.08] font-mono shrink-0 ml-2 shadow-sm">
+              ⌘K
+            </kbd>
           </button>
 
-          {/* Reset Demo State Button */}
-          <button
-            onClick={() => {
-              if (window.confirm('Reset all demo state (telemetry, risks, remediations, compliance) back to pristine baseline?')) {
-                resetDemoState();
-              }
-            }}
-            className="px-2.5 py-1.5 rounded text-xs font-medium bg-slate-900 hover:bg-slate-850 text-slate-400 hover:text-amber-300 border border-slate-800 transition-colors flex items-center space-x-1"
-            title="Reset platform state back to baseline"
-          >
-            <RefreshCw className="w-3 h-3 text-amber-400" />
-            <span>Reset Demo</span>
-          </button>
+          {/* Persona Role Switcher Segmented Pill */}
+          <div className="flex items-center bg-[#12141c] border border-white/[0.08] rounded-lg p-0.5 text-xs shadow-inner">
+            {roles.map(role => {
+              const isActive = activeRole === role;
+              return (
+                <button
+                  key={role}
+                  onClick={() => setActiveRole(role)}
+                  className={`px-2.5 py-1 rounded-[6px] text-[11px] transition-all ${
+                    isActive
+                      ? 'bg-[#222533] text-white font-medium border border-white/[0.12] shadow-sm'
+                      : 'text-zinc-400 hover:text-zinc-200 font-normal'
+                  }`}
+                >
+                  {role}
+                </button>
+              );
+            })}
+          </div>
 
-          {/* AI Copilot Drawer Trigger */}
-          <button
-            onClick={() => setIsCopilotDrawerOpen(!isCopilotDrawerOpen)}
-            className={`flex items-center space-x-1.5 px-3 py-1.5 rounded text-xs font-medium border transition-colors ${
-              isCopilotDrawerOpen
-                ? 'bg-slate-800 text-sky-300 border-slate-700'
-                : 'bg-slate-900 hover:bg-slate-850 text-slate-300 border-slate-800'
-            }`}
-          >
-            <Bot className="w-3.5 h-3.5 text-sky-400" />
-            <span>Risk Copilot</span>
-          </button>
+          <div className="h-5 w-px bg-white/[0.08] hidden sm:block" />
+
+          {/* Action Group: Walkthrough, Reset, AI Copilot */}
+          <div className="flex items-center space-x-2">
+
+            {/* AI Copilot Drawer Trigger (Restrained distinct action) */}
+            <button
+              onClick={() => setIsCopilotDrawerOpen(!isCopilotDrawerOpen)}
+              className={`h-9 px-3 rounded-lg text-xs font-medium flex items-center space-x-1.5 transition-all shadow-sm ${
+                isCopilotDrawerOpen
+                  ? 'bg-amber-500/25 text-amber-200 border border-amber-500/40 ring-1 ring-amber-500/30'
+                  : 'bg-gradient-to-r from-amber-500/15 to-orange-500/10 hover:from-amber-500/25 hover:to-orange-500/20 text-amber-300 border border-amber-500/30'
+              }`}
+            >
+              <Bot className="w-3.5 h-3.5 text-amber-400" />
+              <span className="text-[11px] font-semibold">AI Copilot</span>
+            </button>
+          </div>
         </div>
       </header>
 

@@ -40,21 +40,21 @@ const MainContent = () => {
   ];
 
   return (
-    <div className="flex h-screen bg-[#080c14] overflow-hidden">
+    <div className="flex h-screen bg-[#0c0d12] overflow-hidden">
       {/* Sidebar */}
       <Sidebar />
 
       {/* Main Workspace */}
       <main className="flex-1 flex flex-col min-w-0 overflow-y-auto">
         {/* Top Demo Script Helper Bar */}
-        {isWalkthroughOpen && (
-          <div className="bg-slate-900/95 border-b border-sky-500/20 px-5 py-2.5 flex items-center justify-between text-xs shrink-0 select-none">
+        {/* {isWalkthroughOpen && (
+          <div className="bg-[#12131b]/95 backdrop-blur-md border-b border-white/[0.07] px-6 py-2 flex items-center justify-between text-xs shrink-0 select-none shadow-md">
             <div className="flex items-center space-x-3 overflow-x-auto py-0.5">
-              <div className="flex items-center space-x-1.5 text-sky-400 font-semibold shrink-0">
-                <Play className="w-3.5 h-3.5 fill-sky-400" />
+              <div className="flex items-center space-x-1.5 text-amber-400 font-semibold shrink-0 text-[11px]">
+                <Play className="w-3 h-3 fill-amber-400" />
                 <span>5-Min Judge Demo Flow:</span>
               </div>
-              <div className="flex items-center space-x-2 shrink-0">
+              <div className="flex items-center space-x-1.5 shrink-0">
                 {demoSteps.map(s => {
                   const isActive = activeTab === s.tab;
                   return (
@@ -64,13 +64,13 @@ const MainContent = () => {
                         setActiveTab(s.tab);
                         if (s.action) s.action();
                       }}
-                      className={`px-2.5 py-1 rounded text-[11px] font-medium border transition-colors flex items-center space-x-1 ${
+                      className={`px-3 py-1 rounded-xl text-[11px] font-medium border transition-all flex items-center space-x-1.5 ${
                         isActive
-                          ? 'bg-sky-500/20 text-sky-300 border-sky-500/40'
-                          : 'bg-slate-950 text-slate-400 border-slate-800 hover:text-slate-200'
+                          ? 'bg-amber-500/15 text-amber-300 border-amber-500/40 shadow-sm shadow-amber-500/10'
+                          : 'bg-[#181922] text-zinc-400 border-white/[0.06] hover:text-zinc-200 hover:border-white/[0.12]'
                       }`}
                     >
-                      <span className="font-mono">{s.step}.</span>
+                      <span className="font-mono text-amber-400/90 font-bold">{s.step}.</span>
                       <span>{s.title}</span>
                     </button>
                   );
@@ -80,15 +80,15 @@ const MainContent = () => {
 
             <button
               onClick={() => setIsWalkthroughOpen(false)}
-              className="text-slate-500 hover:text-slate-300 text-[11px] ml-4 shrink-0"
+              className="text-zinc-400 hover:text-zinc-200 text-[11px] ml-4 shrink-0 font-medium px-2.5 py-1 rounded-lg hover:bg-white/[0.05] transition-colors"
             >
               Dismiss
             </button>
-          </div>
-        )}
+          </div> */}
+        {/* )} */}
 
         {/* View Switcher */}
-        <div className="flex-1 p-6 max-w-7xl w-full mx-auto">
+        <div key={activeTab} className="flex-1 p-6 max-w-[1600px] w-full mx-auto animate-fade-in">
           {activeTab === 'dashboard' && <ExecutiveDashboard />}
           {activeTab === 'risk' && <RiskExposureView />}
           {activeTab === 'assets' && <AssetIntelligenceView />}
@@ -113,7 +113,7 @@ const MainContent = () => {
 export function App() {
   return (
     <RiskStoreProvider>
-      <div className="min-h-screen flex flex-col bg-[#080c14] text-slate-100 antialiased selection:bg-sky-500/20 selection:text-sky-300">
+      <div className="min-h-screen flex flex-col bg-[#0c0d12] text-zinc-100 antialiased selection:bg-amber-500/20 selection:text-amber-300">
         <TopHeader />
         <MainContent />
       </div>

@@ -19,7 +19,7 @@ export const Badge = ({
   }[variant] || 'bg-slate-800 text-slate-300 border border-slate-700';
 
   return (
-    <span className={`inline-flex items-center font-medium rounded ${sizeClasses} ${variantClasses} ${className}`}>
+    <span className={`inline-flex items-center font-medium rounded-full ${sizeClasses} ${variantClasses} ${className}`}>
       {children}
     </span>
   );

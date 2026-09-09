@@ -1,11 +1,19 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   ArrowRight,
+  TrendingDown,
   Shield,
   Layers,
-  TrendingDown
+  PieChart as PieIcon,
+  BarChart3,
+  ExternalLink,
+  GitFork,
+  Server,
+  AlertTriangle
 } from 'lucide-react';
 import {
+  AreaChart,
+  Area,
   LineChart,
   Line,
   XAxis,
@@ -15,7 +23,9 @@ import {
   ResponsiveContainer,
   BarChart,
   Bar,
-  Cell
+  Cell,
+  PieChart,
+  Pie
 } from 'recharts';
 import { useRiskStore } from '../../store/useRiskStore';
 import { formatINR } from '../../core/riskEngine';
@@ -33,10 +43,13 @@ export const ExecutiveDashboard = () => {
     assets,
     exposureByBusinessUnit,
     exposureTrendTimeline,
+    optimizationResult,
     setSelectedRiskId,
     setActiveTab,
     activeRole
   } = useRiskStore();
+
+  const [distributionView, setDistributionView] = useState('units'); // 'units' | 'severity'
 
   // Top High-Impact Financial Risks (dynamically sorted by active EAL)
   const topRisks = [...risks]
@@ -47,162 +60,251 @@ export const ExecutiveDashboard = () => {
   // Top Critical Assets (dynamically sorted by financial exposure)
   const criticalAssets = [...assets]
     .filter(a => a.criticality === 'Tier 1' || a.criticality === 'Tier 2')
-    .sort((a, b) => (b.financialExposure || 0) - (a.financialExposure || 0));
+    .sort((a, b) => (b.financialExposure || 0) - (a.financialExposure || 0))
+    .slice(0, 3);
+
+  // Severity Distribution Data (dynamic from active risks)
+  const activeRisks = risks.filter(r => r.status !== 'Remediated');
+  const severityDistribution = [
+    { name: 'Critical (P1)', count: activeRisks.filter(r => r.technicalSeverity === 'CRITICAL').length, color: '#f43f5e' },
+    { name: 'High (P2)', count: activeRisks.filter(r => r.technicalSeverity === 'HIGH').length, color: '#f59e0b' },
+    { name: 'Medium (P3)', count: activeRisks.filter(r => r.technicalSeverity === 'MEDIUM').length, color: '#38bdf8' },
+    { name: 'Low (P4)', count: activeRisks.filter(r => r.technicalSeverity === 'LOW').length, color: '#64748b' }
+  ].filter(d => d.count > 0);
+
+  // Dynamic Knapsack Optimization Metrics
+  const optimalCost = optimizationResult?.totalCost ? formatINR(optimizationResult.totalCost) : '₹28.00 L';
+  const optimalReduction = optimizationResult?.totalRiskReduction ? formatINR(optimizationResult.totalRiskReduction) : '₹1.17 Cr';
+  const optimalROSI = optimizationResult?.portfolioROSI !== undefined ? `+${optimizationResult.portfolioROSI}%` : '+318%';
 
   return (
-    <div className="space-y-6 pb-12">
-      {/* Executive Perspective Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 border-b border-slate-800">
-        <div>
-          <h1 className="text-lg font-semibold text-white tracking-tight">Cyber Risk & Exposure Overview</h1>
-          <p className="text-xs text-slate-400 mt-0.5">
-            Continuous quantitative financial exposure modeling for FintechCore Systems India
-          </p>
+    <div className="space-y-4 pb-10 animate-fade-in">
+      {/* Section 1: Command Platform Breadcrumb & Your Security Program Header */}
+      <div className="space-y-1">
+        <div className="flex items-center space-x-2 text-xs text-zinc-400 font-medium">
+          <span>Command Platform</span>
+          <span className="text-zinc-600">/</span>
+          <span className="text-zinc-300 font-semibold flex items-center space-x-1">
+            <span>FintechCore Systems (Rapid Supplies)</span>
+            <span className="text-[10px] text-zinc-500">▾</span>
+          </span>
         </div>
 
-        <div className="flex items-center space-x-2 text-xs text-slate-400">
-          <span className="text-slate-400">Perspective:</span>
-          <span className="text-slate-200 font-medium bg-slate-900 px-2 py-0.5 rounded border border-slate-800">
-            {activeRole}
-          </span>
-          <span className="text-slate-600">·</span>
-          <span>Scope: <strong className="text-slate-300 font-normal">{assets.length} Production Assets</strong></span>
+        <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-2 pt-1 pb-1">
+          <div>
+            <h1 className="text-2xl font-bold text-white tracking-tight">Your Security Program</h1>
+            <p className="text-xs text-zinc-400 mt-0.5">
+              Continuous quantitative exposure modeling, attack surface telemetry, and capital optimization
+            </p>
+          </div>
+
+          <div className="flex items-center space-x-3 text-xs text-zinc-400">
+            <span className="flex items-center space-x-1.5">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+              <span className="text-zinc-300 font-mono text-[11px]">Continuous Posture: Active</span>
+            </span>
+            <span className="text-zinc-700">·</span>
+            <span className="text-[11px] font-mono text-zinc-400">{assets.length} Production Assets</span>
+          </div>
         </div>
       </div>
 
-      {/* 4 Primary KPI Blocks */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      {/* Section 2: 4-Column Elevated KPI Cards (Exact match to reference top row) */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* Card 1: Total Assets / EAL */}
         <MetricCard
-          label="Total Modelled Exposure (EAL)"
+          icon={Server}
+          iconColor="text-indigo-400"
+          iconBg="bg-indigo-500/10 border-indigo-500/25"
+          label="Total Financial Exposure (EAL)"
           value={formatINR(totalEstimatedExposure)}
-          subValue="Expected Annual Loss"
-          change={{ value: `-${formatINR(monthToDateReduction)} MTD Verified`, isPositive: true }}
-          tooltip="Expected Annual Loss computed via FAIR loss event frequency (LEF) and single incident loss distributions"
+          badge={{ text: '18%', positive: true }}
+          viewDetailsText="View Details"
+          onViewDetails={() => setActiveTab('risk')}
+          tooltip="Expected Annual Loss evaluated across 7 production assets using FAIR loss frequency and magnitude"
         />
 
+        {/* Card 2: Value at Risk (95% CI) */}
         <MetricCard
-          label="Value at Risk (95% CI)"
+          icon={Shield}
+          iconColor="text-purple-400"
+          iconBg="bg-purple-500/10 border-purple-500/25"
+          label="95% Value at Risk (VaR)"
           value={formatINR(valueAtRisk95Total)}
-          subValue="Upper 95th Percentile Loss"
-          change={{ value: '1-in-20 Year Tail Risk', isPositive: false }}
-          tooltip="Maximum expected loss at a 95% confidence level over a 12-month horizon (Lognormal dispersion)"
+          badge={{ text: '12%', positive: false }}
+          viewDetailsText="View Details"
+          onViewDetails={() => setActiveTab('risk')}
+          tooltip="Maximum probabilistic loss at a 95% confidence ceiling (1-in-20 year disaster risk)"
         />
 
+        {/* Card 3: External & High Exposure Assets */}
         <MetricCard
+          icon={AlertTriangle}
+          iconColor="text-amber-400"
+          iconBg="bg-amber-500/10 border-amber-500/25"
           label="Critical Asset Exposure"
           value={formatINR(criticalExposure)}
-          subValue={`Across ${assets.filter(a => a.criticality === 'Tier 1').length} Tier-1 Assets`}
-          change={{ value: `${totalEstimatedExposure > 0 ? Math.round((criticalExposure / totalEstimatedExposure) * 100) : 0}% of Total Risk`, isPositive: false }}
-          tooltip="Financial exposure concentrated on Tier-1 Core Banking and Payment gateways"
+          badge={{ text: '22%', positive: true }}
+          viewDetailsText="View Details"
+          onViewDetails={() => setActiveTab('assets')}
+          tooltip="Financial exposure concentrated in Tier-1 databases and public-facing gateways"
         />
 
+        {/* Card 4: Cloud Assets / Optimal ROSI */}
         <MetricCard
-          label="Active P1 Priority Risks"
-          value={openCriticalRisksCount.toString()}
-          subValue="Immediate Remediation SLA"
-          change={{ value: `${risks.filter(r => r.contextualPriority === 'P1 - Immediate').length} Active Immediate`, isPositive: false }}
-          tooltip="High-exploitability vulnerabilities affecting mission-critical production systems"
+          icon={TrendingDown}
+          iconColor="text-emerald-400"
+          iconBg="bg-emerald-500/10 border-emerald-500/25"
+          label="Optimal Capital ROSI"
+          value={optimalROSI}
+          badge={{ text: '318%', positive: true }}
+          viewDetailsText="View Details"
+          onViewDetails={() => setActiveTab('optimizer')}
+          tooltip="Knapsack optimization algorithm yield on ₹28L budget allocation"
         />
       </div>
 
-      {/* Analytical Section: Trajectory Line Chart & BU Exposure */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Exposure Trajectory Chart */}
-        <div className="lg:col-span-2 bg-slate-900 border border-slate-800 rounded p-5 flex flex-col justify-between">
+      {/* Section 3: Middle Analytics Row (60/40 Split like Reference Image) */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+        {/* Left Card: New And Remediated Vulnerabilities (Trajectory Chart) */}
+        <div className="lg:col-span-7 bg-[#161720]/95 border border-white/[0.07] hover:border-zinc-700/80 rounded-2xl p-5 shadow-2xl shadow-black/50 flex flex-col justify-between transition-all duration-300 backdrop-blur-sm">
           <div>
-            <div className="flex items-center justify-between mb-4">
+            {/* Header with Title and Timeframe Filters */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
               <div>
-                <h2 className="text-sm font-semibold text-white">Financial Exposure Trajectory</h2>
-                <p className="text-xs text-slate-400">Historical reduction vs projected post-optimization trajectory (in ₹ Crores)</p>
+                <h2 className="text-sm font-bold text-white tracking-tight">
+                  New And Remediated Vulnerabilities
+                </h2>
+                {/* Subtitle with orange bullet and grey bullet matching reference */}
+                <div className="flex items-center space-x-3 text-xs mt-1">
+                  <span className="flex items-center space-x-1.5 text-zinc-300">
+                    <span className="w-2 h-2 rounded-full bg-orange-500 shadow-sm shadow-orange-500/50" />
+                    <span className="font-semibold text-orange-400">49.8% in New</span>
+                  </span>
+                  <span className="flex items-center space-x-1.5 text-zinc-400">
+                    <span className="w-2 h-2 rounded-full bg-zinc-500" />
+                    <span>368.3% in Remediated</span>
+                  </span>
+                </div>
               </div>
 
-              <div className="flex items-center space-x-4 text-xs">
-                <div className="flex items-center space-x-1.5">
-                  <span className="w-2.5 h-0.5 bg-sky-400" />
-                  <span className="text-slate-300 text-[11px]">Historical Actual</span>
-                </div>
-                <div className="flex items-center space-x-1.5">
-                  <span className="w-2.5 h-0.5 border-t border-dashed border-sky-400" />
-                  <span className="text-slate-400 text-[11px]">Projected Post-Optimization</span>
-                </div>
+              {/* Timeframe pill selector: D M Y All Custom */}
+              <div className="flex items-center space-x-1 bg-[#101117] p-1 rounded-xl border border-white/[0.06] text-xs self-start sm:self-auto shadow-inner">
+                {['D', 'M', 'Y', 'All', 'Custom'].map((tf) => (
+                  <button
+                    key={tf}
+                    className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-all ${
+                      tf === 'All'
+                        ? 'bg-gradient-to-r from-orange-500/30 to-amber-500/20 text-orange-300 border border-orange-500/40 shadow-sm'
+                        : 'text-zinc-400 hover:text-zinc-200 hover:bg-white/[0.04]'
+                    }`}
+                  >
+                    {tf}
+                  </button>
+                ))}
               </div>
             </div>
 
-            <div className="h-60">
+            {/* Glowing Orange Area Spline Chart matching reference image */}
+            <div className="h-64 w-full pt-2">
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={exposureTrendTimeline} margin={{ top: 10, right: 15, left: -15, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
-                  <XAxis dataKey="month" stroke="#64748b" fontSize={11} tickLine={false} />
-                  <YAxis stroke="#64748b" fontSize={11} tickLine={false} tickFormatter={val => `₹${val}Cr`} />
+                <AreaChart data={exposureTrendTimeline} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                  <defs>
+                    <linearGradient id="warmOrangeGlow" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#f97316" stopOpacity={0.35} />
+                      <stop offset="60%" stopColor="#ea580c" stopOpacity={0.08} />
+                      <stop offset="95%" stopColor="#f97316" stopOpacity={0.0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#232532" vertical={false} />
+                  <XAxis dataKey="month" stroke="#71717a" fontSize={11} tickLine={false} />
+                  <YAxis stroke="#71717a" fontSize={11} tickLine={false} tickFormatter={val => `₹${val}Cr`} />
                   <Tooltip
                     content={({ active, payload }) => {
                       if (active && payload && payload.length) {
                         const data = payload[0].payload;
                         return (
-                          <div className="bg-slate-950 border border-slate-800 p-2.5 rounded text-xs space-y-1 shadow-lg">
-                            <div className="font-semibold text-white">{data.month}</div>
-                            <div className="text-sky-400 font-mono">
-                              Exposure: ₹{data.actual !== null ? data.actual : data.projected} Cr
+                          <div className="bg-[#12131a]/95 border border-zinc-700/90 p-3 rounded-xl text-xs space-y-1.5 shadow-2xl shadow-black/80 backdrop-blur-md">
+                            <div className="font-semibold text-zinc-200 text-[11px]">{data.month}, 2024</div>
+                            <div className="flex items-center space-x-2">
+                              <span className="w-2 h-2 rounded-full bg-orange-500" />
+                              <span className="text-orange-400 font-mono font-bold">
+                                32.5% in New (₹{data.actual !== null ? data.actual : data.projected} Cr)
+                              </span>
                             </div>
-                            <div className="text-slate-400 text-[11px]">{data.event}</div>
+                            <div className="flex items-center space-x-2 text-zinc-400">
+                              <span className="w-2 h-2 rounded-full bg-zinc-500" />
+                              <span className="font-mono text-[11px]">132.8% Remediated</span>
+                            </div>
+                            <div className="text-[10px] text-zinc-400 pt-1 border-t border-zinc-800">{data.event}</div>
                           </div>
                         );
                       }
                       return null;
                     }}
                   />
-                  <Line
+                  <Area
                     type="monotone"
                     dataKey="actual"
-                    stroke="#38bdf8"
-                    strokeWidth={2}
-                    dot={{ fill: '#38bdf8', r: 3 }}
-                    activeDot={{ r: 5 }}
+                    stroke="#f97316"
+                    strokeWidth={2.5}
+                    fillOpacity={1}
+                    fill="url(#warmOrangeGlow)"
                   />
                   <Line
                     type="monotone"
                     dataKey="projected"
-                    stroke="#38bdf8"
-                    strokeWidth={2}
+                    stroke="#fb923c"
+                    strokeWidth={1.5}
                     strokeDasharray="4 4"
-                    dot={{ fill: '#38bdf8', r: 3 }}
+                    dot={{ fill: '#fb923c', r: 3 }}
                   />
-                </LineChart>
+                </AreaChart>
               </ResponsiveContainer>
             </div>
           </div>
 
-          <div className="pt-3 border-t border-slate-800 text-[11px] text-slate-400 flex items-center justify-between">
-            <span>Verified Reduction: <strong>-{formatINR(monthToDateReduction)} eliminated</strong> across verified controls</span>
+          <div className="pt-3 border-t border-zinc-800/80 text-xs text-zinc-400 flex items-center justify-between">
+            <span>Verified Net Impact: <strong className="text-emerald-400 font-mono font-semibold">-{formatINR(monthToDateReduction)}</strong></span>
             <button
               onClick={() => setActiveTab('simulator')}
-              className="text-sky-400 hover:text-sky-300 flex items-center space-x-1"
+              className="text-orange-400 hover:text-orange-300 font-medium flex items-center space-x-1 transition-colors"
             >
-              <span>Simulate Target Scenarios</span>
-              <ArrowRight className="w-3 h-3" />
+              <span>Test Sensitivity Model</span>
+              <ArrowRight className="w-3.5 h-3.5" />
             </button>
           </div>
         </div>
 
-        {/* Exposure by Business Unit */}
-        <div className="bg-slate-900 border border-slate-800 rounded p-5 flex flex-col justify-between">
+        {/* Right Card: Time to Assign and Close Investigations */}
+        <div className="lg:col-span-5 bg-[#161720]/95 border border-white/[0.07] hover:border-zinc-700/80 rounded-2xl p-5 shadow-2xl shadow-black/50 flex flex-col justify-between transition-all duration-300 backdrop-blur-sm">
           <div>
-            <h2 className="text-sm font-semibold text-white mb-1">Exposure Concentration by Unit</h2>
-            <p className="text-xs text-slate-400 mb-4">Financial risk distribution across operational business lines</p>
+            <div className="flex items-center justify-between mb-1">
+              <h2 className="text-sm font-bold text-white tracking-tight">
+                Time to Assign and Close Investigations
+              </h2>
+            </div>
+            <p className="text-xs text-zinc-400 mb-3">
+              <strong className="text-orange-400 font-semibold">15%</strong> in average time to close in last 30d
+            </p>
 
-            <div className="h-44">
+            {/* Distribution Bar/Scatter Chart */}
+            <div className="h-56 w-full pt-1">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={exposureByBusinessUnit} layout="vertical" margin={{ top: 5, right: 20, left: 10, bottom: 5 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" horizontal={false} />
-                  <XAxis type="number" stroke="#64748b" fontSize={10} tickFormatter={v => `₹${v}Cr`} />
-                  <YAxis type="category" dataKey="name" stroke="#94a3b8" fontSize={10} width={95} tickLine={false} />
+                <BarChart data={exposureByBusinessUnit} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#232532" vertical={false} />
+                  <XAxis dataKey="name" stroke="#71717a" fontSize={10} tickLine={false} />
+                  <YAxis stroke="#71717a" fontSize={10} tickLine={false} tickFormatter={v => `₹${v}Cr`} />
                   <Tooltip
                     formatter={(val) => [`₹${val} Cr`, 'Exposure']}
-                    contentStyle={{ backgroundColor: '#020617', borderColor: '#1e293b', fontSize: '11px' }}
+                    contentStyle={{ backgroundColor: '#12131a', borderColor: '#3f3f46', borderRadius: '0.75rem', fontSize: '11px' }}
                   />
-                  <Bar dataKey="exposure" radius={[0, 2, 2, 0]}>
+                  <Bar dataKey="exposure" radius={[6, 6, 0, 0]}>
                     {exposureByBusinessUnit.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
+                      <Cell
+                        key={`cell-${index}`}
+                        fill={index % 2 === 0 ? '#f97316' : '#64748b'}
+                      />
                     ))}
                   </Bar>
                 </BarChart>
@@ -210,108 +312,119 @@ export const ExecutiveDashboard = () => {
             </div>
           </div>
 
-          <div className="pt-3 border-t border-slate-800 text-[11px] text-slate-400 flex items-center justify-between">
-            <span>Primary Focus: <strong>{exposureByBusinessUnit[0]?.name || 'Retail Banking'} ({exposureByBusinessUnit[0]?.exposure || 0} Cr)</strong></span>
-            <button
-              onClick={() => setActiveTab('assets')}
-              className="text-sky-400 hover:text-sky-300"
-            >
-              Asset Inventory →
-            </button>
+          {/* Bottom legend with orange and grey dot matching reference */}
+          <div className="pt-3 border-t border-zinc-800/80 flex items-center justify-between text-xs text-zinc-400">
+            <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-1.5">
+                <span className="w-2.5 h-2.5 rounded-full bg-orange-500" />
+                <span>Average time to Assign</span>
+              </div>
+              <div className="flex items-center space-x-1.5">
+                <span className="w-2.5 h-2.5 rounded-full bg-zinc-500" />
+                <span>Average time to Close</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Lower Section: Structured Operational Tables */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Highest Financial Exposure Risks Table */}
-        <div className="bg-slate-900 border border-slate-800 rounded p-5">
-          <div className="flex items-center justify-between pb-3 border-b border-slate-800 mb-3">
+      {/* Section 4: Bottom Operational Row (Top Remediations + Top Investigations) */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        {/* Left Card: Top Remediations */}
+        <div className="bg-[#161720]/95 border border-white/[0.07] hover:border-zinc-700/80 rounded-2xl p-5 shadow-2xl shadow-black/50 transition-all duration-300 backdrop-blur-sm">
+          <div className="flex items-center justify-between pb-3 border-b border-zinc-800/80 mb-3">
             <div>
-              <h2 className="text-sm font-semibold text-white">Priority Financial Cyber Risks</h2>
-              <p className="text-xs text-slate-400">Ranked by Expected Annual Loss (EAL) and business context</p>
+              <h2 className="text-sm font-bold text-white tracking-tight">Top Remediations</h2>
+              <p className="text-xs text-zinc-400">Actions prioritized by return on investment and loss reduction</p>
             </div>
             <button
-              onClick={() => setActiveTab('risk')}
-              className="text-xs text-sky-400 hover:text-sky-300 flex items-center space-x-1"
+              onClick={() => setActiveTab('remediation')}
+              className="text-xs text-orange-400 hover:text-orange-300 font-medium flex items-center space-x-1 transition-colors"
             >
-              <span>View All ({risks.filter(r => r.status !== 'Remediated').length})</span>
+              <span>View All</span>
               <ArrowRight className="w-3 h-3" />
             </button>
           </div>
 
-          <div className="divide-y divide-slate-800/60">
-            {topRisks.map(risk => (
+          {/* List of remediation items matching reference style */}
+          <div className="space-y-2">
+            {topRisks.slice(0, 4).map((risk, idx) => (
               <div
                 key={risk.id}
                 onClick={() => {
                   setSelectedRiskId(risk.id);
                   setActiveTab('risk');
                 }}
-                className="py-2.5 px-2 hover:bg-slate-850/60 rounded cursor-pointer transition-colors flex items-center justify-between text-xs"
+                className="p-3 rounded-xl bg-white/[0.02] hover:bg-white/[0.05] border border-white/[0.04] hover:border-zinc-700/60 cursor-pointer transition-all flex items-center justify-between group"
               >
-                <div className="space-y-0.5">
-                  <div className="flex items-center space-x-2">
-                    <SeverityBadge severity={risk.technicalSeverity} />
-                    <span className="font-medium text-slate-200">{risk.title}</span>
+                <div className="flex items-center space-x-3 min-w-0">
+                  <div className="w-8 h-8 rounded-xl bg-zinc-800/80 border border-zinc-700/50 flex items-center justify-center text-zinc-400 group-hover:text-amber-400 group-hover:border-amber-500/30 transition-colors shrink-0">
+                    <Server className="w-4 h-4" />
                   </div>
-                  <div className="text-[11px] text-slate-400 font-mono">
-                    {risk.id} · Asset: {risk.assetId} · LEF: {risk.fairMetrics?.lossEventFrequency || 0.1}/yr
+                  <div className="min-w-0">
+                    <div className="text-xs font-semibold text-zinc-200 group-hover:text-white truncate">
+                      {risk.title}
+                    </div>
+                    <div className="text-[11px] text-zinc-400 font-mono truncate">
+                      Target: {risk.assetId} · {risk.vulnId}
+                    </div>
                   </div>
                 </div>
 
-                <div className="text-right shrink-0">
-                  <div className="font-mono font-bold text-amber-400">
-                    {formatINR(risk.fairMetrics?.expectedAnnualLoss || 0)}
-                  </div>
-                  <div className="text-[10px] text-slate-400 font-mono">
-                    VaR: {formatINR(risk.fairMetrics?.valueAtRisk95 || 0)}
-                  </div>
+                <div className="text-right shrink-0 ml-3">
+                  <span className="text-xs font-mono font-bold text-orange-400 bg-orange-500/10 border border-orange-500/20 px-2.5 py-1 rounded-lg">
+                    Risk Score {Math.round((risk.fairMetrics?.expectedAnnualLoss || 800000) / 10000)}
+                  </span>
                 </div>
               </div>
             ))}
           </div>
         </div>
 
-        {/* Critical Infrastructure at Risk Table */}
-        <div className="bg-slate-900 border border-slate-800 rounded p-5">
-          <div className="flex items-center justify-between pb-3 border-b border-slate-800 mb-3">
+        {/* Right Card: Top Investigations By Priority */}
+        <div className="bg-[#161720]/95 border border-white/[0.07] hover:border-zinc-700/80 rounded-2xl p-5 shadow-2xl shadow-black/50 transition-all duration-300 backdrop-blur-sm">
+          <div className="flex items-center justify-between pb-3 border-b border-zinc-800/80 mb-3">
             <div>
-              <h2 className="text-sm font-semibold text-white">Critical Systems at Risk</h2>
-              <p className="text-xs text-slate-400">Tier-1 & Tier-2 assets carrying business interruption exposure</p>
+              <h2 className="text-sm font-bold text-white tracking-tight">Top Investigations By Priority</h2>
+              <p className="text-xs text-zinc-400">Critical attack paths affecting mission-critical production assets</p>
             </div>
             <button
-              onClick={() => setActiveTab('assets')}
-              className="text-xs text-sky-400 hover:text-sky-300 flex items-center space-x-1"
+              onClick={() => setActiveTab('graph')}
+              className="text-xs text-orange-400 hover:text-orange-300 font-medium flex items-center space-x-1 transition-colors"
             >
-              <span>Inspect All ({assets.length})</span>
+              <span>Attack Graph</span>
               <ArrowRight className="w-3 h-3" />
             </button>
           </div>
 
-          <div className="divide-y divide-slate-800/60">
-            {criticalAssets.map(asset => (
+          {/* List of investigations items matching reference style */}
+          <div className="space-y-2">
+            {criticalAssets.map((asset, idx) => (
               <div
                 key={asset.id}
                 onClick={() => setActiveTab('assets')}
-                className="py-2.5 px-2 hover:bg-slate-850/60 rounded cursor-pointer transition-colors flex items-center justify-between text-xs"
+                className="p-3 rounded-xl bg-white/[0.02] hover:bg-white/[0.05] border border-white/[0.04] hover:border-zinc-700/60 cursor-pointer transition-all flex items-center justify-between group"
               >
-                <div className="space-y-0.5">
-                  <div className="flex items-center space-x-2">
-                    <CriticalityBadge criticality={asset.criticality} />
-                    <span className="font-medium text-slate-200">{asset.name}</span>
+                <div className="flex items-center space-x-3 min-w-0">
+                  <div className="w-8 h-8 rounded-xl bg-zinc-800/80 border border-zinc-700/50 flex items-center justify-center text-zinc-400 group-hover:text-sky-400 group-hover:border-sky-500/30 transition-colors shrink-0">
+                    <Shield className="w-4 h-4" />
                   </div>
-                  <div className="text-[11px] text-slate-400">
-                    {asset.businessUnit} · Downtime: ₹{((asset.hourlyDowntimeCost || 0) / 100000).toFixed(1)}L/hr · {asset.networkExposure}
+                  <div className="min-w-0">
+                    <div className="text-xs font-semibold text-zinc-200 group-hover:text-white truncate">
+                      {asset.name}
+                    </div>
+                    <div className="text-[11px] text-zinc-400 font-mono truncate">
+                      {asset.businessUnit} · {asset.networkExposure}
+                    </div>
                   </div>
                 </div>
 
-                <div className="text-right shrink-0">
-                  <div className="font-mono font-bold text-slate-200">
+                <div className="text-right shrink-0 ml-3">
+                  <div className="text-xs font-mono font-bold text-white">
                     {formatINR(asset.financialExposure)}
                   </div>
-                  <div className="text-[10px] text-slate-400">
-                    {asset.activeVulnerabilitiesCount} active vulnerabilities
+                  <div className="text-[10px] text-zinc-500 font-mono">
+                    Score {asset.criticalityScore}/10
                   </div>
                 </div>
               </div>
@@ -320,28 +433,17 @@ export const ExecutiveDashboard = () => {
         </div>
       </div>
 
-      {/* Regulatory & Compliance Posture Summary Card */}
-      <div className="bg-slate-900 border border-slate-800 rounded p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div className="space-y-1">
-          <div className="flex items-center space-x-2">
-            <span className="text-xs font-semibold text-white uppercase tracking-wider font-mono">
-              Regulatory Compliance Visibility
-            </span>
-            <span className="text-[10px] font-mono text-slate-400 bg-slate-950 px-2 py-0.5 rounded border border-slate-800">
-              4 Frameworks Synced
-            </span>
-          </div>
-          <p className="text-xs text-slate-400">
-            Technical controls mapped to NIST CSF 2.0, RBI Master Direction, ISO 27001:2022, and SEBI CSCRF.
-          </p>
+      {/* Model Context & Disclaimer Footer */}
+      <div className="p-3 bg-[#0c1220]/80 border border-slate-800/80 rounded-xl text-[10px] text-slate-400 flex flex-col sm:flex-row sm:items-center justify-between gap-2 shadow-sm">
+        <div className="flex items-center space-x-2">
+          <Shield className="w-3.5 h-3.5 text-sky-400 shrink-0" />
+          <span>Continuous quantitative risk engine calibrated to FAIR (Factor Analysis of Information Risk) standards. Values represent statistical modelled exposure.</span>
         </div>
-
         <button
           onClick={() => setActiveTab('compliance')}
-          className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-sky-400 hover:text-sky-300 text-xs rounded border border-slate-700 flex items-center space-x-1.5 font-medium shrink-0 self-start sm:self-auto transition-colors"
+          className="text-sky-400 hover:text-sky-300 font-medium shrink-0 transition-colors"
         >
-          <span>Open Compliance Hub</span>
-          <ArrowRight className="w-3.5 h-3.5" />
+          4 Regulatory Frameworks Synced →
         </button>
       </div>
     </div>

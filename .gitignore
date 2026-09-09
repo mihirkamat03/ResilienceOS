@@ -30,3 +30,9 @@ scratch/
 *.njsproj
 *.sln
 *.sw?
+
+# Presentations & Documents
+*.pptx
+*.ppt
+*.pdf
+PPTS/
