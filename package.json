@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "server": "node server/src/index.js",
+    "server:test": "node server/test/api.test.js"
   },
   "dependencies": {
     "clsx": "^2.1.1",
