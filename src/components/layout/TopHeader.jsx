@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Search,
   Bot,
@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import { useRiskStore } from '../../store/useRiskStore';
 import { MethodologyModal } from '../common/MethodologyModal';
+import { ResilienceAPI } from '../../services/api';
 
 export const TopHeader = () => {
   const {
@@ -26,6 +27,23 @@ export const TopHeader = () => {
   } = useRiskStore();
 
   const [isMethodologyOpen, setIsMethodologyOpen] = useState(false);
+  const [isBackendOnline, setIsBackendOnline] = useState(false);
+
+  useEffect(() => {
+    let isMounted = true;
+    ResilienceAPI.checkHealth().then(online => {
+      if (isMounted) setIsBackendOnline(online);
+    });
+    const interval = setInterval(() => {
+      ResilienceAPI.checkHealth().then(online => {
+        if (isMounted) setIsBackendOnline(online);
+      });
+    }, 12000);
+    return () => {
+      isMounted = false;
+      clearInterval(interval);
+    };
+  }, []);
 
   const roles = ['CISO', 'CFO', 'SecOps', 'Compliance'];
 
@@ -54,13 +72,16 @@ export const TopHeader = () => {
         {/* ================================================================= */}
         <div className="hidden xl:flex items-center bg-[#12141c] border border-white/[0.06] rounded-full px-4 py-1.5 space-x-3 text-xs shadow-inner">
           {/* Engine Status */}
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-2" title={isBackendOnline ? 'Authoritative Node.js Decision Engine API connected' : 'Local In-Browser Decision Engine active (Demo Fallback)'}>
             <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-60"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+              <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-60 ${isBackendOnline ? 'bg-emerald-400' : 'bg-amber-400'}`}></span>
+              <span className={`relative inline-flex rounded-full h-2 w-2 ${isBackendOnline ? 'bg-emerald-500' : 'bg-amber-500'}`}></span>
             </span>
             <span className="text-[11px] text-zinc-400">
               Engine: <strong className="text-zinc-200 font-medium ml-0.5">FAIR Quantitative</strong>
+              <span className={`text-[9px] uppercase tracking-wider font-mono font-medium ml-1.5 px-1.5 py-0.5 rounded border ${isBackendOnline ? 'text-emerald-300 bg-emerald-500/10 border-emerald-500/20' : 'text-amber-300 bg-amber-500/10 border-amber-500/20'}`}>
+                {isBackendOnline ? 'API Connected' : 'Local Fallback'}
+              </span>
             </span>
           </div>
 
@@ -105,7 +126,7 @@ export const TopHeader = () => {
               <span className="text-[11px] text-zinc-400 group-hover:text-zinc-300 truncate">Search risks, CVEs, assets...</span>
             </div>
             <kbd className="text-[10px] bg-white/[0.06] text-zinc-400 px-1.5 py-0.5 rounded border border-white/[0.08] font-mono shrink-0 ml-2 shadow-sm">
-              ⌘K
+              ⌘ K
             </kbd>
           </button>
 

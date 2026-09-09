@@ -78,7 +78,7 @@ export const ExecutiveDashboard = () => {
   const optimalROSI = optimizationResult?.portfolioROSI !== undefined ? `+${optimizationResult.portfolioROSI}%` : '+318%';
 
   return (
-    <div className="space-y-4 pb-10 animate-fade-in">
+    <div className="space-y-4 pb-10 mb-4 animate-fade-in">
       {/* Section 1: Command Platform Breadcrumb & Your Security Program Header */}
       <div className="space-y-1">
         <div className="flex items-center space-x-2 text-xs text-zinc-400 font-medium">

@@ -191,7 +191,7 @@ export const Sidebar = () => {
       </div>
 
       {/* Modern SaaS Bottom Footer (Notification, Settings, Profile) */}
-      <div className="p-3 border-t border-zinc-800/70 bg-[#0e0f14] space-y-1.5">
+      <div className="mb-3 p-3 border-t border-zinc-800/70 bg-[#0e0f14] space-y-1.5">
         {/* Notification row with red count badge matching reference */}
         <div className="flex items-center justify-between px-3 py-2 rounded-xl text-xs text-zinc-400 hover:text-zinc-200 hover:bg-white/[0.04] transition-colors cursor-pointer">
           <div className="flex items-center space-x-2.5">
