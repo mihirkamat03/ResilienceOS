@@ -10,7 +10,7 @@ import {
 } from 'lucide-react';
 import { useRiskStore } from '../../store/useRiskStore';
 import { MethodologyModal } from '../common/MethodologyModal';
-import { ResilienceAPI } from '../../services/api';
+import { ResilienceAPI } from '../../services/api.js';
 
 export const TopHeader = () => {
   const {

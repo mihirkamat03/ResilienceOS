@@ -1,0 +1,28 @@
+{
+  "name": "resilience-os-server",
+  "version": "1.0.0",
+  "description": "ResilienceOS Authoritative Decision Engine Backend API",
+  "type": "module",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js",
+    "test": "node test/api.test.js"
+  },
+  "keywords": [
+    "cybersecurity",
+    "fair",
+    "risk-quantification",
+    "optimizer",
+    "sih2026"
+  ],
+  "author": "FintechCore Systems / Team ByteMe",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "morgan": "^1.10.0",
+    "swagger-ui-express": "^5.0.1"
+  }
+}
